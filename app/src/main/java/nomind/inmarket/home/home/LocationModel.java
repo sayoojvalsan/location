@@ -66,7 +66,6 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
             Log.d(TAG, "Location services are already enabled. Skipping");
             return;
         }
-        mRequestingLocationUpdates = true;
         if (!Util.doWeHavePermission(mContext)){
             Log.w(TAG, "Permissions are missing. Skipping");
             return;
@@ -83,6 +82,10 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
         //We are checking for permission on Top
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
+        Log.d(TAG, "Location services enabled");
+        mRequestingLocationUpdates = true;
+
+
     }
 
 
@@ -141,11 +144,13 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
 
     @Override
     public void onConnectionSuspended(int i) {
+        Log.d(TAG, "onConnectionSuspended");
 
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG, "onConnectionFailed");
 
     }
 
