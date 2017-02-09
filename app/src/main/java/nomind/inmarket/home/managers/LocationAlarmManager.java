@@ -38,10 +38,10 @@ public class LocationAlarmManager {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         //Wake up at midnight
-        //calendar.add(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
 
         alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                4000, alarmIntent);
+                AlarmManager.INTERVAL_DAY, alarmIntent);
 
 
 
