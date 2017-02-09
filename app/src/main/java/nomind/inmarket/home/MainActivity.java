@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
         mHomePresenter.setListener(this);
         checkPermissions();
 
-        mLocationTextView.setText("No location yet");
+        mLocationTextView.setText(getString(R.string.no_location_yet));
     }
 
 
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
                     init();
                 } else {
                     Log.d(TAG, "Permission denied");
-                    mLocationTextView.setText("Inorder for the app to work properly, we need location permission");
+                    mLocationTextView.setText(getString(R.string.error_permission));
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }

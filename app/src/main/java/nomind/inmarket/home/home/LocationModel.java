@@ -28,7 +28,6 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
     private nomind.inmarket.home.listeners.LocationListener mLocationListener;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private Location mLastLocation;
     private boolean mRequestingLocationUpdates;
     private Handler mHandler;
     private TimerRunnable mRunnable;
@@ -40,7 +39,7 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
 
     }
 
-    synchronized void buildGoogleApiClient(final Context context) {
+    private synchronized void buildGoogleApiClient(final Context context) {
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -60,7 +59,7 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
     }
 
 
-    protected void startLocationUpdates() {
+    private void startLocationUpdates() {
         Log.d(TAG, "startLocationUpdates");
 
         if (mRequestingLocationUpdates) {
@@ -131,11 +130,11 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
 
         if (!Util.doWeHavePermission(mContext)) return;
 
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
 
-        if(mLastLocation != null){
-            mLocationListener.onLastLocationFound(mLastLocation);
+        if(lastLocation != null){
+            mLocationListener.onLastLocationFound(lastLocation);
         }
 
     }
@@ -162,7 +161,7 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
     }
 
 
-    public class TimerRunnable implements Runnable{
+    private class TimerRunnable implements Runnable{
 
         @Override
         public void run() {

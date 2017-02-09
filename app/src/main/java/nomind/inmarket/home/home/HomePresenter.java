@@ -3,7 +3,6 @@ package nomind.inmarket.home.home;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
-import nomind.inmarket.home.managers.LocationAlarmManager;
 import nomind.inmarket.home.listeners.LocationListener;
 import nomind.inmarket.home.util.Util;
 
@@ -15,13 +14,19 @@ public class HomePresenter implements HomePresenterInterface {
     private static final String TAG = HomePresenter.class.getSimpleName();
 
     private static final String LOCATION_KEY = "LOCATION_KEY";
-    HomeViewInterface mViewInterface;
-    LocationModel mLocationModel;
-    Context mContext;
+    private HomeViewInterface mViewInterface;
+    private LocationModel mLocationModel;
+    private Context mContext;
     private Location mCurrentLocation;
     private HomePresenterListener mHomePresenterListener;
     private boolean mTestMode;
 
+    /**
+     * Presenter which helps communication between view and location service
+     * @param viewInterface
+     * @param locationModel
+     * @param context
+     */
     public HomePresenter(HomeViewInterface viewInterface, LocationModel locationModel,  Context context) {
         mViewInterface = viewInterface;
         mLocationModel = locationModel;
@@ -41,6 +46,7 @@ public class HomePresenter implements HomePresenterInterface {
 
     @Override
     public void onViewLoaded() {
+        //Check if we have correct permissions
         if(!doWeHavePermission(mContext)){
 
             if(mHomePresenterListener != null){
@@ -48,15 +54,17 @@ public class HomePresenter implements HomePresenterInterface {
             }
             return;
         }
-
+        //Check if we have play services
         if(!isGooglePlayServicesAvailable(mContext)){
             if(mHomePresenterListener != null){
                 mHomePresenterListener.onException(new IllegalStateException("Require Google play services"));
             }
             return;
         }
-
+        //Let the view know we are showing progress
         mViewInterface.onShowProgress();
+
+        //Fetch the latest location
         mLocationModel.fetch(new LocationListener() {
             @Override
             public void onLocationFound(Location location) {
@@ -92,6 +100,7 @@ public class HomePresenter implements HomePresenterInterface {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        //Save the current location. Helpful when device rotates
         if(mCurrentLocation != null) {
             outState.putParcelable(LOCATION_KEY, mCurrentLocation);
         }
@@ -100,6 +109,8 @@ public class HomePresenter implements HomePresenterInterface {
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
+
+        //restore the current location. Helpful when device rotates
         if (savedInstanceState.keySet().contains(LOCATION_KEY)) {
             // Since LOCATION_KEY was found in the Bundle, we can be sure that
             // mCurrentLocationis not null.
@@ -117,7 +128,7 @@ public class HomePresenter implements HomePresenterInterface {
     /**
      * Check if we have Location permissions
      * @param context
-     * @return
+     * @return boolean
      */
     private boolean doWeHavePermission(Context context){
         if(mTestMode) return true;
