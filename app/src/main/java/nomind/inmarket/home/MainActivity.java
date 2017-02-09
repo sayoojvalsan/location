@@ -33,14 +33,25 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        new LocationAlarmManager().init(getApplicationContext());
         mHomePresenter = new HomePresenter(this, new LocationModel(getApplicationContext()), getApplicationContext());
         mHomePresenter.setListener(this);
         checkPermissions();
-        if(isGooglePlayServicesAvailable(this)) {
-            mHomePresenter.onViewLoaded();
-        }
+
         mLocationTextView.setText("No location yet");
+    }
+
+
+    @Override
+    protected void onPause() {
+        mHomePresenter.onPause();
+        super.onPause();
+    }
+
+
+    @Override
+    protected void onResume() {
+        mHomePresenter.onResume();
+        super.onResume();
     }
 
     private void checkPermissions() {
@@ -80,6 +91,10 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
             }
 
         }
+        else{
+            init();
+
+        }
     }
 
     @Override
@@ -93,9 +108,9 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
 
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    Log.d(TAG, "WE have the permission");
+                    Log.d(TAG, "We have the location permission");
 
-                    mHomePresenter.onViewLoaded();
+                    init();
                 } else {
                     Log.d(TAG, "Permission denied");
                     mLocationTextView.setText("Inorder for the app to work properly, we need location permission");
@@ -110,6 +125,11 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
         }
 
 
+    }
+
+    private void init() {
+        new LocationAlarmManager().init(getApplicationContext());
+        mHomePresenter.onViewLoaded();
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import nomind.inmarket.home.listeners.LocationListener;
 import nomind.inmarket.home.home.LocationModel;
+import nomind.inmarket.home.util.Util;
 
 
 public class FetchLocationService extends Service implements LocationListener {
@@ -31,12 +32,22 @@ public class FetchLocationService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "FetchLocationService started");
 
+
+        if (!Util.doWeHavePermission(getApplicationContext()) || !Util.isGooglePlayServicesAvailable(getApplicationContext())){
+            Log.w(TAG, "No permission or Google play services are missing. Stoping the service");
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
+
         //Start our timer thread to stop location updates after sometime.
         //We dont need our service running all day long if no location is received in 20 Secs
         mTimerThread = new Thread(new TimerRunnable());
         mTimerThread.start();
 
         mIntent = intent;
+
+
 
         mLocationModel  = new LocationModel(getApplicationContext());
         mLocationModel.fetch(this);
@@ -48,9 +59,14 @@ public class FetchLocationService extends Service implements LocationListener {
 
     @Override
     public void onDestroy() {
-        WakefulBroadcastReceiver.completeWakefulIntent(mIntent);
-        Log.d(TAG, "FetchLocationService completed");
+        try {
+            WakefulBroadcastReceiver.completeWakefulIntent(mIntent);
+            Log.d(TAG, "FetchLocationService completed");
 
+        }
+        catch (Exception e){
+            Log.e(TAG, e.getMessage());
+        }
         super.onDestroy();
     }
 

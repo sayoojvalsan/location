@@ -68,7 +68,18 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
             return;
         }
         mRequestingLocationUpdates = true;
-        if (!Util.doWeHavePermission(mContext)) return;
+        if (!Util.doWeHavePermission(mContext)){
+            Log.w(TAG, "Permissions are missing. Skipping");
+            return;
+        }
+
+        if(!mGoogleApiClient.isConnected()) {
+            Log.w(TAG, "Google client is not connected. Skipping");
+
+            return;
+        }
+
+        if (!Util.isGooglePlayServicesAvailable(mContext)) return;
 
         //We are checking for permission on Top
         LocationServices.FusedLocationApi.requestLocationUpdates(
@@ -79,6 +90,7 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
     private void stopLocationUpdates() {
         Log.d(TAG, "stopLocationUpdates");
         mRequestingLocationUpdates = false;
+        if(!mGoogleApiClient.isConnected()) return;
         LocationServices.FusedLocationApi.removeLocationUpdates(
                 mGoogleApiClient, this);
     }
@@ -140,6 +152,7 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(TAG, "Got new location..");
 
         if(mLocationListener != null){
             mLocationListener.onLocationFound(location);
@@ -158,7 +171,7 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
                 stopLocationUpdates();
             }
             catch (Exception e){
-                Log.w(TAG, "Interupted");
+                Log.w(TAG, "Timer Interrupted");
             }
         }
     }
