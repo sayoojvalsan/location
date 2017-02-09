@@ -25,7 +25,6 @@ public class LocationAlarmManager {
 
     public void init(Context context) {
 
-        Log.d(TAG, "Setting alarm in LocationAlarmManager");
 
 
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

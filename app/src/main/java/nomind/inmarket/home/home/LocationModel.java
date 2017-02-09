@@ -87,6 +87,7 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
     @Override
     public void fetch(nomind.inmarket.home.listeners.LocationListener locationListener) {
         mLocationListener = locationListener;
+        if(!Util.isGooglePlayServicesAvailable(mContext)) return;
 
         mGoogleApiClient.connect();
     }
@@ -97,7 +98,7 @@ public class LocationModel implements LocationModelnterface, GoogleApiClient.Con
     }
 
     @Override
-    public void resume() {
+    public void onResume() {
         startLocationUpdates();
     }
 

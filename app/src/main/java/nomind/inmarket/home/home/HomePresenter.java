@@ -3,8 +3,6 @@ package nomind.inmarket.home.home;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
-
 import nomind.inmarket.home.managers.LocationAlarmManager;
 import nomind.inmarket.home.listeners.LocationListener;
 import nomind.inmarket.home.util.Util;
@@ -22,8 +20,9 @@ public class HomePresenter implements HomePresenterInterface {
     Context mContext;
     private Location mCurrentLocation;
     private HomePresenterListener mHomePresenterListener;
+    private boolean mTestMode;
 
-    public HomePresenter(HomeViewInterface viewInterface, LocationModel locationModel, Context context) {
+    public HomePresenter(HomeViewInterface viewInterface, LocationModel locationModel,  Context context) {
         mViewInterface = viewInterface;
         mLocationModel = locationModel;
         mContext = context;
@@ -33,11 +32,7 @@ public class HomePresenter implements HomePresenterInterface {
         mHomePresenterListener = homePresenterListener;
     }
 
-    private void setUpAlarmManager() {
 
-        LocationAlarmManager alarmManager = new LocationAlarmManager();
-        alarmManager.init(mContext);
-    }
 
     private void showLocation(Location location) {
         mViewInterface.showLocation(location.getLatitude(), location.getLongitude());
@@ -46,7 +41,7 @@ public class HomePresenter implements HomePresenterInterface {
 
     @Override
     public void onViewLoaded() {
-        if(!Util.doWeHavePermission(mContext)){
+        if(!doWeHavePermission(mContext)){
 
             if(mHomePresenterListener != null){
                 mHomePresenterListener.onException(new IllegalStateException("Need location permission"));
@@ -54,16 +49,12 @@ public class HomePresenter implements HomePresenterInterface {
             return;
         }
 
-        if(!Util.isGooglePlayServicesAvailable(mContext)){
+        if(!isGooglePlayServicesAvailable(mContext)){
             if(mHomePresenterListener != null){
                 mHomePresenterListener.onException(new IllegalStateException("Require Google play services"));
             }
             return;
         }
-
-        Log.d(TAG, "Permission are all good");
-        setUpAlarmManager();
-
 
         mViewInterface.onShowProgress();
         mLocationModel.fetch(new LocationListener() {
@@ -96,7 +87,7 @@ public class HomePresenter implements HomePresenterInterface {
 
     @Override
     public void onResume() {
-        mLocationModel.resume();
+        mLocationModel.onResume();
     }
 
     @Override
@@ -121,5 +112,27 @@ public class HomePresenter implements HomePresenterInterface {
     public interface HomePresenterListener{
 
          void onException(Exception e);
+    }
+
+    /**
+     * Check if we have Location permissions
+     * @param context
+     * @return
+     */
+    private boolean doWeHavePermission(Context context){
+        if(mTestMode) return true;
+        return Util.doWeHavePermission(context);
+    }
+
+    private boolean isGooglePlayServicesAvailable(Context context){
+        if(mTestMode) return true;
+        return Util.isGooglePlayServicesAvailable(context);
+    }
+
+    /**
+     * User for testing
+     */
+    public void setTestMode(){
+        mTestMode = true;
     }
 }

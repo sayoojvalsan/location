@@ -17,6 +17,7 @@ import nomind.inmarket.R;
 import nomind.inmarket.home.home.HomePresenter;
 import nomind.inmarket.home.home.HomeViewInterface;
 import nomind.inmarket.home.home.LocationModel;
+import nomind.inmarket.home.managers.LocationAlarmManager;
 
 public class MainActivity extends AppCompatActivity implements HomeViewInterface, HomePresenter.HomePresenterListener {
 
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        new LocationAlarmManager().init(getApplicationContext());
         mHomePresenter = new HomePresenter(this, new LocationModel(getApplicationContext()), getApplicationContext());
         mHomePresenter.setListener(this);
         checkPermissions();
@@ -118,12 +120,12 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
 
     @Override
     public void onLastLocationFound(double lat, double lon) {
-
+        mLocationTextView.setText(lat + "  " + lon);
     }
 
     @Override
     public void onShowProgress() {
-
+        //TODO show progress if we need to
     }
 
     @Override
@@ -145,6 +147,11 @@ public class MainActivity extends AppCompatActivity implements HomeViewInterface
     }
 
 
+    /**
+     * Check if Google play services is availble. If not, do the resolution if any
+     * @param activity
+     * @return boolean
+     */
     public boolean isGooglePlayServicesAvailable(Activity activity) {
         GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int status = googleApiAvailability.isGooglePlayServicesAvailable(activity);

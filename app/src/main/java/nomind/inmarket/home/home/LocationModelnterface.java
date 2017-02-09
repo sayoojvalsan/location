@@ -18,5 +18,5 @@ public interface LocationModelnterface {
 
      void onPause();
 
-     void resume();
+     void onResume();
 }
